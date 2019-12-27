@@ -4,8 +4,8 @@ import { StyleSheet, Text, View, Image } from 'react-native';
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>Welcome to TreeTrends!</Text>
-      <Image source={'./assets/treetrends.png'} alt='hi'/>
+      <Text>Welcome to</Text>
+      <Image source={require('./assets/treetrends.png')} />
     </View>
   );
 }
