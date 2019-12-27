@@ -6,6 +6,7 @@ export default function App() {
     <View style={styles.container}>
       <Text>Welcome to</Text>
       <Image source={require('./assets/treetrends.png')} />
+      <Image source={require('./assets/loraxicon.jpg')} />
     </View>
   );
 }
