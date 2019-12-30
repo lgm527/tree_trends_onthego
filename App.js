@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, Dimensions } from 'react-native';
-import MapView from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 
 export default class App extends React.Component {
 
@@ -19,7 +19,7 @@ export default class App extends React.Component {
     this.treeFetch(this.state.neighborhood);
   }
 
-  treeFetch(n){
+  treeFetch(n) {
     fetch(`https://data.cityofnewyork.us/resource/uvpi-gqnh.json?nta_name=${n}&status=Alive&steward=None`,{
       method: 'GET',
       headers: {
@@ -30,24 +30,55 @@ export default class App extends React.Component {
     })
     .then(res => res.json())
     .then(trees => {
-      console.log(trees);
-      // this.setState({
-      //   trees: trees,
-      //   region: {
-      //     latitude: trees[400].latitude,
-      //     longitude: trees[400].longitude
-      //   }
-      // })
+      this.setState({
+        trees: trees
+        // region: {
+        //   latitude: trees[400].latitude,
+        //   longitude: trees[400].longitude
+        // }
+      })
     })
   }
 
+  normalizeString(str) {
+    let res
+    let theString
+      if (str !== undefined && str !== null) {
+        theString = str.replace(/[^a-zA-Z\d\s:]*/g, '')
+        if (str.includes(' ')){
+        let words = theString.split(' ')
+        let result = []
+        words.forEach((word) => {
+          result.push( word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() )
+        })
+        res = result.join(' ')
+        } else {
+         res = theString.charAt(0).toUpperCase() + theString.slice(1).toLowerCase()
+        }
+      }
+    return res
+  }
 
   render() {
+
+    const allTress = this.state.trees.map((tree) => {
+      let coords = {latitude: Number(tree.latitude), longitude: Number(tree.longitude)}
+      let title = this.normalizeString(tree.spc_common)
+      let description = this.normalizeString(tree.address)
+      return <Marker
+        coordinate={coords}
+        title={title}
+        description={description}
+        key={tree.tree_id}
+      />
+    })
     return (
       <View style={styles.container}>
         <Image source={require('./assets/treetrends.png')} />
         <Image source={require('./assets/loraxicon.jpg')} />
-        <MapView style={styles.mapStyle} region={this.state.region} />
+        <MapView style={styles.mapStyle} region={this.state.region}>
+        {allTress}
+        </MapView>
       </View>
     )
   }
