@@ -4,12 +4,15 @@ import MapView, { Marker } from 'react-native-maps';
 
 export default class App extends React.Component {
 
+  // latitude: 40.7085874,
+  // longitude: -73.963434,
+
   state = {
     region: {
       latitude: 40.7085874,
       longitude: -73.963434,
-      latitudeDelta: 0.01322,
-      longitudeDelta: 0.0821,
+      latitudeDelta: 0.017,
+      longitudeDelta: 0.017
     },
     trees: [],
     neighborhood: 'Williamsburg'
@@ -31,11 +34,13 @@ export default class App extends React.Component {
     .then(res => res.json())
     .then(trees => {
       this.setState({
-        trees: trees
-        // region: {
-        //   latitude: trees[400].latitude,
-        //   longitude: trees[400].longitude
-        // }
+        trees: trees,
+        region: {
+          latitude: Number(trees[500].latitude),
+          longitude: Number(trees[500].longitude),
+          latitudeDelta: 0.017,
+          longitudeDelta: 0.017
+        }
       })
     })
   }
@@ -70,8 +75,10 @@ export default class App extends React.Component {
         title={title}
         description={description}
         key={tree.tree_id}
+        image={require('./assets/tree.png')}
       />
     })
+
     return (
       <View style={styles.container}>
         <Image source={require('./assets/treetrends.png')} />
