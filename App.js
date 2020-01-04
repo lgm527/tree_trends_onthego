@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, Dimensions } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import RNPickerSelect from 'react-native-picker-select';
 
 export default class App extends React.Component {
 
