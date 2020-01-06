@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, Dimensions } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import { StyleSheet, Text, TextInput, View, Image, Dimensions, Modal } from 'react-native';
+import MapView, { Marker, Callout } from 'react-native-maps';
 import Dropdown from './Dropdown.js';
 
 export default class App extends React.Component {
@@ -13,7 +13,9 @@ export default class App extends React.Component {
       longitudeDelta: 0.017
     },
     trees: [],
-    neighborhood: 'Williamsburg'
+    neighborhood: 'Williamsburg',
+    emailModalVisible: false,
+    email: null
   }
 
   componentDidMount() {
@@ -67,24 +69,53 @@ export default class App extends React.Component {
     this.treeFetch(newN)
   }
 
+  sendEmail() {
+    //send email to address in this.state.email
+    this.emailModal();
+  }
+
   render() {
 
     const allTress = this.state.trees.map((tree) => {
       let coords = {latitude: Number(tree.latitude), longitude: Number(tree.longitude)}
-      let title = this.normalizeString(tree.spc_common)
-      let description = this.normalizeString(tree.address)
+      let title = this.normalizeString(tree.spc_common)+' at '+this.normalizeString(tree.address)
+      let description = 'Click here to email this tree'
       return <Marker
         coordinate={coords}
         title={title}
         description={description}
         key={tree.tree_id}
-        image={require('./assets/tree.png')}
-      />
+        image={require('./assets/tree.png')}>
+        <Callout
+        style={styles.calloutStyle}
+        onPress={() => {this.setState({emailModalVisible: true})}}></Callout>
+      </Marker>
     })
 
     return (
       <View style={styles.container}>
         <Image source={require('./assets/treetrends.png')} />
+
+          <Modal
+          visible={this.state.emailModalVisible} >
+            <View style={styles.modalStyle}>
+              <Text
+              style={styles.closeModal}
+              onPress={() => {this.setState({emailModalVisible: false})}}>
+              ✖︎</Text>
+              <Text>I want to send this to...</Text>
+              <TextInput
+              placeholder="Email Address"
+              onChangeText={(email) => this.setState({email})}
+              value={this.state.email}
+              textContentType='emailAddress'
+              />
+              <Text
+              style={styles.sendBtn}
+              onPress={() => {this.sendEmail()}}>
+              SEND</Text>
+            </View>
+          </Modal>
 
         <Dropdown updateNeighborhood={this.updateNeighborhood} />
 
@@ -106,5 +137,21 @@ const styles = StyleSheet.create({
   mapStyle: {
     width: Dimensions.get('window').width-20,
     height: Dimensions.get('window').height/2,
+  }, modalStyle: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  calloutStyle: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 5,
+  },
+  closeModal: {
+    color: 'red',
+  }, sendBtn: {
+    color: 'blue',
+    fontWeight: 'bold',
   }
 });
