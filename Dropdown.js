@@ -200,16 +200,17 @@ export default class Dropdown extends React.Component {
     }
   }
 
-  handleChange = (selectedOption) => {
-    this.props.updateNeighborhood(this.convertStringToNTACode(selectedOption.value))
+  handleChange = (value) => {
+    this.props.updateNeighborhood(this.convertStringToNTACode(value))
   }
 
 
   render(){
     return(
       <RNPickerSelect
-          onValueChange={(value) => console.log(value)}
+          onValueChange={(value) => this.handleChange(value)}
           items={listOptions}
+          placeholder={{label: 'Williamsburg', value: 'Williamsburg'}}
       />
     )
   }

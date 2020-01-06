@@ -62,6 +62,11 @@ export default class App extends React.Component {
     return res
   }
 
+  updateNeighborhood = (newN) => {
+    this.setState({neighborhood: newN})
+    this.treeFetch(newN)
+  }
+
   render() {
 
     const allTress = this.state.trees.map((tree) => {
@@ -81,7 +86,7 @@ export default class App extends React.Component {
       <View style={styles.container}>
         <Image source={require('./assets/treetrends.png')} />
 
-        <Dropdown treeFetch={this.treeFetch} />
+        <Dropdown updateNeighborhood={this.updateNeighborhood} />
 
         <MapView style={styles.mapStyle} region={this.state.region}>
         {allTress}
