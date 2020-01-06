@@ -201,17 +201,35 @@ export default class Dropdown extends React.Component {
   }
 
   handleChange = (value) => {
-    this.props.updateNeighborhood(this.convertStringToNTACode(value))
+    if (value) {
+      this.props.updateNeighborhood(this.convertStringToNTACode(value))
+    }
   }
-
 
   render(){
     return(
       <RNPickerSelect
           onValueChange={(value) => this.handleChange(value)}
           items={listOptions}
-          placeholder={{label: 'Williamsburg', value: 'Williamsburg'}}
+          placeholder={{label: 'Select a neighborhood...', value: null}}
+          style={pickerStyle}
       />
     )
   }
+}
+
+const pickerStyle = {
+  inputAndroid: {
+    color: 'black',
+    backgroundColor: 'white',
+    padding: 3,
+    margin: 10,
+  },
+  inputIOS: {
+    color: 'black',
+    backgroundColor: 'white',
+    padding: 3,
+    margin: 10,
+  },
+  placeholderColor: 'black'
 }
