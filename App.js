@@ -1,12 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, Dimensions } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import RNPickerSelect from 'react-native-picker-select';
+import Dropdown from './Dropdown.js';
 
 export default class App extends React.Component {
-
-  // latitude: 40.7085874,
-  // longitude: -73.963434,
 
   state = {
     region: {
@@ -83,7 +80,9 @@ export default class App extends React.Component {
     return (
       <View style={styles.container}>
         <Image source={require('./assets/treetrends.png')} />
-        <Image source={require('./assets/loraxicon.jpg')} />
+
+        <Dropdown treeFetch={this.treeFetch} />
+
         <MapView style={styles.mapStyle} region={this.state.region}>
         {allTress}
         </MapView>
