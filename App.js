@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, TextInput, View, Image, Dimensions, Modal } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import Dropdown from './Dropdown.js';
+import openMap from 'react-native-open-maps';
 
 export default class App extends React.Component {
 
@@ -13,6 +14,10 @@ export default class App extends React.Component {
       longitudeDelta: 0.017
     },
     trees: [],
+    treeClicked: {
+      latitude: 0,
+      longitude: 0
+    },
     neighborhood: 'Williamsburg',
     emailModalVisible: false,
     email: null
@@ -69,9 +74,22 @@ export default class App extends React.Component {
     this.treeFetch(newN)
   }
 
+  showModal(coordinates) {
+    this.setState({
+      treeClicked: {
+        latitude: coordinates.latitude,
+        longitude: coordinates.longitude
+      },
+      emailModalVisible: true
+    })
+  }
+
+  openNativeMaps() {
+    openMap({ latitude: this.state.treeClicked.latitude, longitude: this.state.treeClicked.longitude });
+  }
+
   sendEmail() {
-    //send email to address in this.state.email
-    this.emailModal();
+    //open native email app to share tree's details
   }
 
   render() {
@@ -88,7 +106,7 @@ export default class App extends React.Component {
         image={require('./assets/tree.png')}>
         <Callout
         style={styles.calloutStyle}
-        onPress={() => {this.setState({emailModalVisible: true})}}></Callout>
+        onPress={() => {this.showModal(coords)}}></Callout>
       </Marker>
     })
 
@@ -113,7 +131,11 @@ export default class App extends React.Component {
               <Text
               style={styles.sendBtn}
               onPress={() => {this.sendEmail()}}>
-              SEND</Text>
+              Email 📩</Text>
+              <Text
+              style={styles.mapBtn}
+              onPress={() => {this.openNativeMaps()}}>
+              Pin on Maps 📍</Text>
             </View>
           </Modal>
 
@@ -150,8 +172,15 @@ const styles = StyleSheet.create({
   },
   closeModal: {
     color: 'red',
-  }, sendBtn: {
+  },
+  sendBtn: {
     color: 'blue',
     fontWeight: 'bold',
+    padding: 5,
+  },
+  mapBtn: {
+    color: 'brown',
+    fontWeight: 'bold',
+    padding: 5,
   }
 });
