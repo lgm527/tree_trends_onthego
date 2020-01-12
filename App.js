@@ -1,8 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, TextInput, View, Image, Dimensions, Modal } from 'react-native';
+import { StyleSheet, Text, TextInput, View, Image, Dimensions, Modal, Linking, Platform } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import Dropdown from './Dropdown.js';
-import openMap from 'react-native-open-maps';
 
 export default class App extends React.Component {
 
@@ -16,11 +15,11 @@ export default class App extends React.Component {
     trees: [],
     treeClicked: {
       latitude: 0,
-      longitude: 0
+      longitude: 0,
+      info: null,
     },
     neighborhood: 'Williamsburg',
-    emailModalVisible: false,
-    email: null
+    modalVisible: false,
   }
 
   componentDidMount() {
@@ -74,22 +73,39 @@ export default class App extends React.Component {
     this.treeFetch(newN)
   }
 
-  showModal(coordinates) {
+  showModal(coordinates, info) {
     this.setState({
       treeClicked: {
         latitude: coordinates.latitude,
-        longitude: coordinates.longitude
+        longitude: coordinates.longitude,
+        info: info,
       },
-      emailModalVisible: true
+      modalVisible: true
     })
   }
 
-  openNativeMaps() {
-    openMap({ latitude: this.state.treeClicked.latitude, longitude: this.state.treeClicked.longitude });
+  sendText() {
+    if (Platform.OS === 'android') {
+      Linking.openURL(`sms:?body=${this.state.treeClicked.info}`).catch(err => console.error('An error occurred', err));
+    } else {
+      Linking.openURL(`sms:&body=${this.state.treeClicked.info}`).catch(err => console.error('An error occurred', err));
+    }
   }
 
   sendEmail() {
-    //open native email app to share tree's details
+    if (Platform.OS === 'android') {
+      Linking.openURL(`mailto:whoever@gmail.com?cc=?subject=Check out this Tree!&body=${this.state.treeClicked.info}`).catch(err => console.error('An error occurred', err));
+    } else {
+      Linking.openURL(`mailto:whoever@gmail.com?cc=&subject=Check out this Tree!&body=${this.state.treeClicked.info}`).catch(err => console.error('An error occurred', err));
+    }
+  }
+
+  openMaps() {
+    if (Platform.OS === 'android') {
+      Linking.openURL(`geo:0,0?q=${this.state.treeClicked.latitude},${this.state.treeClicked.longitude}(${this.state.treeClicked.info})`).catch(err => console.error('An error occurred', err));
+    } else {
+      Linking.openURL(`http://maps.apple.com/?ll=${this.state.treeClicked.latitude},${this.state.treeClicked.longitude}&q=${this.state.treeClicked.info}`).catch(err => console.error('An error occurred', err));
+    }
   }
 
   render() {
@@ -97,7 +113,7 @@ export default class App extends React.Component {
     const allTress = this.state.trees.map((tree) => {
       let coords = {latitude: Number(tree.latitude), longitude: Number(tree.longitude)}
       let title = this.normalizeString(tree.spc_common)+' at '+this.normalizeString(tree.address)
-      let description = 'Click here to email this tree'
+      let description = 'Click here to share this tree'
       return <Marker
         coordinate={coords}
         title={title}
@@ -106,7 +122,7 @@ export default class App extends React.Component {
         image={require('./assets/tree.png')}>
         <Callout
         style={styles.calloutStyle}
-        onPress={() => {this.showModal(coords)}}></Callout>
+        onPress={() => {this.showModal(coords, title)}}></Callout>
       </Marker>
     })
 
@@ -115,26 +131,26 @@ export default class App extends React.Component {
         <Image source={require('./assets/treetrends.png')} />
 
           <Modal
-          visible={this.state.emailModalVisible} >
+          visible={this.state.modalVisible} >
             <View style={styles.modalStyle}>
               <Text
               style={styles.closeModal}
-              onPress={() => {this.setState({emailModalVisible: false})}}>
+              onPress={() => {this.setState({modalVisible: false})}}>
               ✖︎</Text>
-              <Text>I want to send this to...</Text>
-              <TextInput
-              placeholder="Email Address"
-              onChangeText={(email) => this.setState({email})}
-              value={this.state.email}
-              textContentType='emailAddress'
-              />
               <Text
-              style={styles.sendBtn}
+              style={styles.shareText}>
+              Share this Tree ❤️ 🌲 🌳 </Text>
+              <Text
+              style={styles.sendTextBtn}
+              onPress={() => {this.sendText()}}>
+              Text 📞</Text>
+              <Text
+              style={styles.sendEmailBtn}
               onPress={() => {this.sendEmail()}}>
               Email 📩</Text>
               <Text
               style={styles.mapBtn}
-              onPress={() => {this.openNativeMaps()}}>
+              onPress={() => {this.openMaps()}}>
               Pin on Maps 📍</Text>
             </View>
           </Modal>
@@ -159,7 +175,8 @@ const styles = StyleSheet.create({
   mapStyle: {
     width: Dimensions.get('window').width-20,
     height: Dimensions.get('window').height/2,
-  }, modalStyle: {
+  },
+  modalStyle: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -172,15 +189,28 @@ const styles = StyleSheet.create({
   },
   closeModal: {
     color: 'red',
+    fontSize: 40,
   },
-  sendBtn: {
+  shareText: {
+    padding: 5,
+    fontSize: 20,
+  },
+  sendTextBtn: {
+    color: 'green',
+    fontWeight: 'bold',
+    padding: 5,
+    fontSize: 15,
+  },
+  sendEmailBtn: {
     color: 'blue',
     fontWeight: 'bold',
     padding: 5,
+    fontSize: 15,
   },
   mapBtn: {
     color: 'brown',
     fontWeight: 'bold',
     padding: 5,
+    fontSize: 15,
   }
 });
