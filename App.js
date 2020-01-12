@@ -151,7 +151,7 @@ export default class App extends React.Component {
               <Text
               style={styles.mapBtn}
               onPress={() => {this.openMaps()}}>
-              Pin on Maps 📍</Text>
+              Pin on Map 📍</Text>
             </View>
           </Modal>
 
