@@ -94,9 +94,9 @@ export default class App extends React.Component {
 
   sendEmail() {
     if (Platform.OS === 'android') {
-      Linking.openURL(`mailto:whoever@gmail.com?cc=?subject=Check out this Tree!&body=${this.state.treeClicked.info}`).catch(err => console.error('An error occurred', err));
+      Linking.openURL(`mailto:whoever@gmail.com?subject=Check%20out%20this%20Tree!&body=${this.state.treeClicked.info}`).catch(err => console.error('An error occurred', err));
     } else {
-      Linking.openURL(`mailto:whoever@gmail.com?cc=&subject=Check out this Tree!&body=${this.state.treeClicked.info}`).catch(err => console.error('An error occurred', err));
+      Linking.openURL(`mailto:whoever@gmail.com?cc=&subject=Check%20out%20this%20Tree!&body=${this.state.treeClicked.info}`).catch(err => console.error('An error occurred', err));
     }
   }
 
