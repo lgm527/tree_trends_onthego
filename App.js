@@ -17,6 +17,8 @@ export default class App extends React.Component {
       latitude: 0,
       longitude: 0,
       info: null,
+      health: null,
+      address: null,
     },
     neighborhood: 'Williamsburg',
     modalVisible: false,
@@ -73,30 +75,34 @@ export default class App extends React.Component {
     this.treeFetch(newN)
   }
 
-  showModal(coordinates, info) {
+  showModal(coordinates, info, health, address) {
     this.setState({
       treeClicked: {
         latitude: coordinates.latitude,
         longitude: coordinates.longitude,
         info: info,
+        health: health,
+        address: address,
       },
       modalVisible: true
     })
   }
 
   sendText() {
+    let body = `${this.state.treeClicked.info}, health status: ${this.state.treeClicked.health}, full address: ${this.state.treeClicked.address}`
     if (Platform.OS === 'android') {
-      Linking.openURL(`sms:?body=${this.state.treeClicked.info}`).catch(err => console.error('An error occurred', err));
+      Linking.openURL(`sms:?body=${body}`).catch(err => console.error('An error occurred', err));
     } else {
-      Linking.openURL(`sms:&body=${this.state.treeClicked.info}`).catch(err => console.error('An error occurred', err));
+      Linking.openURL(`sms:&body=${body}`).catch(err => console.error('An error occurred', err));
     }
   }
 
   sendEmail() {
+    let body = `${this.state.treeClicked.info}, health status: ${this.state.treeClicked.health}, full address: ${this.state.treeClicked.address}`
     if (Platform.OS === 'android') {
-      Linking.openURL(`mailto:whoever@gmail.com?subject=Check%20out%20this%20Tree!&body=${this.state.treeClicked.info}`).catch(err => console.error('An error occurred', err));
+      Linking.openURL(`mailto:whoever@gmail.com?subject=Check%20out%20this%20Tree!&body=${body}`).catch(err => console.error('An error occurred', err));
     } else {
-      Linking.openURL(`mailto:whoever@gmail.com?cc=&subject=Check%20out%20this%20Tree!&body=${this.state.treeClicked.info}`).catch(err => console.error('An error occurred', err));
+      Linking.openURL(`mailto:whoever@gmail.com?cc=&subject=Check%20out%20this%20Tree!&body=${body}`).catch(err => console.error('An error occurred', err));
     }
   }
 
@@ -113,6 +119,8 @@ export default class App extends React.Component {
     const allTress = this.state.trees.map((tree) => {
       let coords = {latitude: Number(tree.latitude), longitude: Number(tree.longitude)}
       let title = this.normalizeString(tree.spc_common)+' at '+this.normalizeString(tree.address)
+      let healthStatus = tree.health
+      let fullLocation = this.normalizeString(tree.address)+', '+tree.nta_name+', New York '+tree.zipcode
       let description = 'Click here to share this tree'
       return <Marker
         coordinate={coords}
@@ -122,7 +130,7 @@ export default class App extends React.Component {
         image={require('./assets/tree.png')}>
         <Callout
         style={styles.calloutStyle}
-        onPress={() => {this.showModal(coords, title)}}></Callout>
+        onPress={() => {this.showModal(coords, title, healthStatus, fullLocation)}}></Callout>
       </Marker>
     })
 
